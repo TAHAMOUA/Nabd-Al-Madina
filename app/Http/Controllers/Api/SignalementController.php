@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Signalement;
 use App\Http\Requests\StoreSignalementRequest;
 use App\Http\Requests\UpdateSignalementRequest;
+use App\Http\Resources\SignalementResource;
 
 
 class SignalementController extends Controller
@@ -19,7 +20,7 @@ class SignalementController extends Controller
         ->latest()
         ->get();
 
-    return response()->json($signalements);
+    return SignalementResource::collection($signalements);
 }
 
     /**
@@ -52,7 +53,7 @@ class SignalementController extends Controller
     $signalement = Signalement::with(['user', 'incident', 'departement'])
         ->findOrFail($id);
 
-    return response()->json($signalement);
+   return new SignalementResource($signalement);
 }
 
     /**

@@ -14,16 +14,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('signalements', SignalementController::class);
 
-});
-Route::patch(
-    '/signalements/{signalement}/statut',
-    [SignalementController::class, 'updateStatus']
-);
-Route::middleware('auth:sanctum')->group(function () {
+    Route::patch(
+        '/signalements/{signalement}/statut',
+        [SignalementController::class, 'updateStatus']
+    );
 
     Route::post(
         '/incidents/validate-grouping',
         [IncidentController::class, 'validateGrouping']
     );
-
 });

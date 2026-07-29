@@ -7,7 +7,8 @@ use App\Models\Signalement;
 use App\Http\Requests\StoreSignalementRequest;
 use App\Http\Requests\UpdateSignalementRequest;
 use App\Http\Resources\SignalementResource;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SignalementController extends Controller
 {
@@ -91,19 +92,19 @@ class SignalementController extends Controller
 }
 public function updateStatus(Request $request, Signalement $signalement)
 {
-    Gate::authorize('isAgent');
+    $this->authorize('update', $signalement);
 
     $request->validate([
-        'status' => 'required|in:nouveau,en_cours,resolu,rejete',
+        'statut' => 'required|in:nouveau,en_cours,resolu,rejete',
     ]);
 
     $signalement->update([
-        'status' => $request->status,
+        'statut' => $request->statut,
     ]);
 
     return response()->json([
-        'message' => 'Statut mis à jour avec succès.',
-        'data' => $signalement
+        'message' => 'Statut mis à jour.',
+        'data' => $signalement,
     ]);
 }
 }

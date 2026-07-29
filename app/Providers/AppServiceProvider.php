@@ -25,11 +25,11 @@ class AppServiceProvider extends ServiceProvider
        Gate::policy(Signalement::class, SignalementPolicy::class);
 
     Gate::define('isAgent', function ($user) {
-        return $user->role === 'agent';
+    return $user->role === 'agent';
     });
 
     Gate::define('isCitoyen', function ($user) {
-        return $user->role === 'citoyen';
+    return $user->role === 'citoyen';
     });
     }
 }

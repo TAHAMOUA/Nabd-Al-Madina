@@ -15,14 +15,17 @@ class IncidentController extends Controller
         Gate::authorize('isAgent');
 
         $validated = $request->validate([
-            'signalements' => 'required|array|min:1',
+            'signalements' => 'required|array|min:2',
+            'signalements.*' => 'exists:signalements,id',
         ]);
 
+        // Création d'un nouvel incident
         $incident = Incident::create([
             'titre' => 'Incident regroupé',
-            'description' => 'Incident créé après validation d’un regroupement',
+            'description' => 'Incident créé après validation du regroupement',
         ]);
 
+        // Association des signalements à l'incident
         Signalement::whereIn('id', $validated['signalements'])
             ->update([
                 'incident_id' => $incident->id,
@@ -31,6 +34,6 @@ class IncidentController extends Controller
         return response()->json([
             'message' => 'Regroupement validé avec succès.',
             'incident' => $incident,
-        ]);
+        ], 201);
     }
 }

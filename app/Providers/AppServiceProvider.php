@@ -22,6 +22,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(Signalement::class, SignalementPolicy::class);
+       Gate::policy(Signalement::class, SignalementPolicy::class);
+
+    Gate::define('isAgent', function ($user) {
+        return $user->role === 'agent';
+    });
+
+    Gate::define('isCitoyen', function ($user) {
+        return $user->role === 'citoyen';
+    });
     }
 }

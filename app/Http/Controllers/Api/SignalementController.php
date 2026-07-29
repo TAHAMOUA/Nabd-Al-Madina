@@ -89,4 +89,21 @@ class SignalementController extends Controller
         'message' => 'Signalement supprimé avec succès.'
     ]);
 }
+public function updateStatus(Request $request, Signalement $signalement)
+{
+    Gate::authorize('isAgent');
+
+    $request->validate([
+        'status' => 'required|in:nouveau,en_cours,resolu,rejete',
+    ]);
+
+    $signalement->update([
+        'status' => $request->status,
+    ]);
+
+    return response()->json([
+        'message' => 'Statut mis à jour avec succès.',
+        'data' => $signalement
+    ]);
+}
 }

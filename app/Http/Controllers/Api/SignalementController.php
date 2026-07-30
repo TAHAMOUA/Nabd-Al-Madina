@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use App\Services\SignalementAnalyzer;
+use App\Models\Departement;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Signalement;
 use App\Http\Requests\StoreSignalementRequest;
@@ -27,7 +29,7 @@ class SignalementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSignalementRequest $request)
+   public function store(StoreSignalementRequest $request, SignalementAnalyzer $analyzer)
 {
     $data = $request->validated();
 
@@ -39,12 +41,41 @@ class SignalementController extends Controller
         $data['photo'] = $request->file('photo')->store('signalements', 'public');
     }
 
-    $signalement = Signalement::create($data);
+  $signalement = Signalement::create($data);
 
-    return response()->json([
-        'message' => 'Signalement créé avec succès.',
-        'data' => $signalement,
-    ], 201);
+try {
+
+    $analysis = $analyzer->analyze($signalement->description);
+
+    $signalement->categorie = $analysis['categorie'] ?? null;
+    $signalement->urgence = $analysis['urgence'] ?? null;
+    $signalement->priorite = $analysis['priorite'] ?? null;
+    $signalement->resume = $analysis['resume'] ?? null;
+
+    if (!empty($analysis['departement'])) {
+
+        $departement = Departement::where(
+            'nom',
+            $analysis['departement']
+        )->first();
+
+        if ($departement) {
+            $signalement->departement_id = $departement->id;
+        }
+    }
+
+    $signalement->save();
+
+} catch (\Throwable $e) {
+
+    Log::error('Erreur IA : '.$e->getMessage());
+
+}
+
+return response()->json([
+    'message' => 'Signalement créé avec succès.',
+    'data' => $signalement,
+], 201);
 }
     /**
      * Display the specified resource.
@@ -106,5 +137,13 @@ public function updateStatus(Request $request, Signalement $signalement)
         'message' => 'Statut mis à jour.',
         'data' => $signalement,
     ]);
+}
+public function similaires(
+    Signalement $signalement,
+    \App\Services\DuplicateDetector $detector
+) {
+    return response()->json(
+        $detector->findSimilar($signalement)
+    );
 }
 }

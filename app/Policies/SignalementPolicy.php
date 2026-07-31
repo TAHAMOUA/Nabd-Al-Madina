@@ -12,7 +12,7 @@ class SignalementPolicy
      */
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['citoyen', 'agent']);
+        return true; // Tout le monde peut voir la liste des signalements
     }
 
     /**
@@ -39,25 +39,33 @@ class SignalementPolicy
     public function create(User $user): bool
     {
         // Seul un citoyen peut créer un signalement
-        return $user->role === 'citoyen';
+        return true;
     }
 
     /**
      * Modifier un signalement
      */
-    public function update(User $user, Signalement $signalement): bool
-    {
-        // Seul l'agent peut modifier le statut
-        return $user->role === 'agent';
-    }
+public function update(User $user, Signalement $signalement): bool
+{
+    return $user->role === 'admin'
+        || $user->role === 'agent'
+        || (
+            $user->role === 'citoyen'
+            && $user->id === $signalement->user_id
+        );
+}
 
     /**
      * Supprimer un signalement
      */
-    public function delete(User $user, Signalement $signalement): bool
-    {
-        return $user->role === 'agent';
-    }
+  public function delete(User $user, Signalement $signalement): bool
+{
+    return $user->role === 'admin'
+        || (
+            $user->role === 'citoyen'
+            && $user->id === $signalement->user_id
+        );
+}
 
     public function restore(User $user, Signalement $signalement): bool
     {

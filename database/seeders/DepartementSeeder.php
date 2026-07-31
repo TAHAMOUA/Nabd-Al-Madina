@@ -7,11 +7,26 @@ use Illuminate\Database\Seeder;
 
 class DepartementSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Departement::factory()->count(7)->create();
+        Departement::create([
+            'nom' => 'Voirie',
+        ]);
+
+        Departement::create([
+            'nom' => 'Propreté',
+        ]);
+
+        Departement::create([
+            'nom' => 'Eclairage public',
+        ]);
+
+        Departement::create([
+            'nom' => 'Eau',
+        ]);
+
+        Departement::create([
+            'nom' => 'Transport',
+        ]);
     }
 }
